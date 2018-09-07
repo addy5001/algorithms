@@ -37,6 +37,11 @@ public class BinarySearchTree {
             return;
         }
 
+        if(searchNode(value)) {
+            System.out.println("Value already present");
+            return;
+        }
+
         addNode(this.rootNode, new Node(value, null, null));
     }
 

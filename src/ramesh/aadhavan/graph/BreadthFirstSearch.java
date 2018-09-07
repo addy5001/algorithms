@@ -2,9 +2,9 @@ package ramesh.aadhavan.graph;
 
 import java.util.*;
 
-public class GraphSearch {
+public class BreadthFirstSearch {
 
-    public static boolean breadFirstSearch(Map<String, List<String>> graph, String start, String element) {
+    public static boolean search(Map<String, List<String>> graph, String start, String element) {
         Queue<String> queue = new ArrayDeque<>();
         Set<String> searched = new HashSet<>();
         queue.add(start);

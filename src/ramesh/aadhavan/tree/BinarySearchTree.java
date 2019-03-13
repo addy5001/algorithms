@@ -23,6 +23,16 @@ public class BinarySearchTree {
         public int compareTo(Node o) {
             return Integer.compare(value, o.value);
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if(obj instanceof Node) {
+                Node comparable = (Node) obj;
+                if(this.value == ((Node) obj).value)
+                    return true;
+            }
+            return false;
+        }
     }
 
     private Node rootNode;
@@ -205,5 +215,21 @@ public class BinarySearchTree {
 
     private boolean isLeafNode(Node node) {
         return Objects.isNull(node.left) && Objects.isNull(node.right);
+    }
+
+    public boolean isSameTree(BinarySearchTree bst) {
+        return isSameTree(this.rootNode, bst.rootNode);
+    }
+
+    private boolean isSameTree(Node tree1, Node tree2) {
+        if(tree1 == null && tree2 == null)
+            return true;
+
+        if(tree1 == null || tree2 == null)
+            return false;
+
+        return tree1.equals(tree2)
+                && isSameTree(tree1.left, tree2.left)
+                && isSameTree(tree1.right, tree2.right);
     }
 }

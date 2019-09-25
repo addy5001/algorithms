@@ -1,8 +1,8 @@
 package ramesh.aadhavan.list;
 
 public class SingleLinkedListNode implements Node {
-    private final int value;
-    private SingleLinkedListNode next;
+    public int value;
+    public SingleLinkedListNode next;
 
     public SingleLinkedListNode(int value) {
         this.value = value;

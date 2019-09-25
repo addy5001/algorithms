@@ -1,23 +1,17 @@
 package ramesh.aadhavan;
 
-import ramesh.aadhavan.tree.BinarySearchTree;
+import ramesh.aadhavan.misc.LruCache;
 
 public class Main {
     public static void main(String[] args) {
-        BinarySearchTree bst = new BinarySearchTree();
-        bst.addNode(4);
-        bst.addNode(5);
-        bst.addNode(2);
+        LruCache<String> lruCache = new LruCache<>(5);
+        lruCache.put(1, "hello");
+        lruCache.put(100, "aadhavan");
+        lruCache.put(234, "madhu");
 
-
-        BinarySearchTree bst2 = new BinarySearchTree();
-        bst2.addNode(4);
-        bst2.addNode(5);
-        bst2.addNode(2);
-
-        System.out.println(bst.isSameTree(bst2));
-
-        bst.inorder();
-        bst.preorder();
+        System.out.println(lruCache.get(1));
+        System.out.println(lruCache.get(100));
+        System.out.println(lruCache.get(234));
+        System.out.println(lruCache.get(1));
     }
 }

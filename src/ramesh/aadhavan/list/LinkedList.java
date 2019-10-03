@@ -1,8 +1,8 @@
 package ramesh.aadhavan.list;
 
+import java.util.Deque;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 public class LinkedList {
     private SingleLinkedListNode head;
@@ -234,7 +234,7 @@ public class LinkedList {
         }
     }
 
-    private int findLength(SingleLinkedListNode node, int len) {
+    private static int findLength(SingleLinkedListNode node, int len) {
         if(node == null)
             return len;
 
@@ -266,13 +266,120 @@ public class LinkedList {
         return node;
     }
 
-    public static void main(String[] args) {
-        LinkedList list = new LinkedList();
-        IntStream.range(1, 20).forEach(list::add);
-        System.out.println(list.toString());
-        list.reverseKAlternateNodes(2);
-        System.out.println(list.toString());
+    public static void sumOfListsAsNumbers(SingleLinkedListNode list1, SingleLinkedListNode list2) {
+        Deque<Integer> stack1 = new java.util.LinkedList<>();
+        Deque<Integer> stack2 = new java.util.LinkedList<>();
+
+        while(list1 != null) {
+            stack1.push(list1.value);
+            list1 = list1.next;
+        }
+
+        while(list2 != null) {
+            stack2.push(list2.value);
+            list2 = list2.next;
+        }
+
+        Deque<Integer> result = new java.util.LinkedList<>();
+        int carry = 0;
+        while(stack1.peek() != null && stack2.peek() != null) {
+            int sum = carry + stack1.pop() + stack2.pop();
+            int digit = sum % 10;
+            carry = sum/10;
+            result.push(digit);
+        }
+
+        while(stack1.peek() != null) {
+            int sum = carry + stack1.pop();
+            int digit = sum % 10;
+            carry = sum/10;
+            result.push(digit);
+        }
+
+        while(stack2.peek() != null) {
+            int sum = carry + stack2.pop();
+            int digit = sum % 10;
+            carry = sum/10;
+            result.push(digit);
+        }
+
+        if(carry > 0)
+            result.push(carry);
+
+        while(result.peek() != null)
+            System.out.print(result.pop());
     }
 
+    public static LinkedList sumOfListsAsNumbersRecursive(SingleLinkedListNode node1, SingleLinkedListNode node2) {
+        int len1 = findLength(node1, 0);
+        int len2 = findLength(node2, 0);
 
+        SingleLinkedListNode bigger, smaller;
+
+        if(len1 > len2) {
+            bigger = node1;
+            smaller = node2;
+        }
+        else {
+            bigger = node2;
+            smaller = node1;
+        }
+
+        int diff = Math.abs(len1 - len2);
+        Deque<Integer> result = new java.util.LinkedList<>();
+        _sumOfListsAsNumbersRecursive(bigger, smaller, result, diff, diff);
+        LinkedList resultList = new LinkedList();
+
+        while(result.peek() != null) {
+            resultList.add(result.pop());
+        }
+
+        return resultList;
+    }
+
+    private static int _sumOfListsAsNumbersRecursive(SingleLinkedListNode bigger,
+                                              SingleLinkedListNode smaller,
+                                              Deque<Integer> result,
+                                              int diff, int counter) {
+        if(counter > 0 && bigger != null) {
+            int sum = bigger.value + _sumOfListsAsNumbersRecursive(bigger.next, smaller, result, diff, counter-1);
+            int carry = sum/10;
+            int digit = sum%10;
+            result.push(digit);
+            if(counter == diff)
+                result.push(carry);
+
+            return carry;
+        }
+        else {
+            if(bigger != null && smaller != null) {
+                int sum = bigger.value + smaller.value + _sumOfListsAsNumbersRecursive(bigger.next, smaller.next, result, diff, counter-1);
+                int carry = sum/10;
+                int digit = sum%10;
+                result.push(digit);
+                if(counter == diff)
+                    result.push(carry);
+
+                return carry;
+
+            }
+            else {
+                return 0;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        LinkedList list = new LinkedList();
+        list.add(5);
+        list.add(3);
+        list.add(1);
+
+        LinkedList list2 = new LinkedList();
+        list2.add(7);
+        list2.add(7);
+        list2.add(5);
+
+        LinkedList result = sumOfListsAsNumbersRecursive(list.head, list2.head);
+    }
 }

@@ -1,9 +1,6 @@
 package ramesh.aadhavan.misc;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class StringOperations {
     public static String longestCommonPrefix(String[] strs) {
@@ -172,8 +169,25 @@ public class StringOperations {
         }
     }
 
+    public static String longestPalindromeSubstring(String word) {
+        return _longestPalindromeSubstring(word,0, word.length());
+    }
+
+    private static String _longestPalindromeSubstring(String word, int begin, int end) {
+        String output = "";
+        String nextPalindrome = "";
+        for(int i=1; begin+i <= end; i++) {
+            String sub = word.substring(begin, begin+i);
+            if(isPalindromeRecurse(sub) && sub.length() > output.length())
+                output = sub;
+            nextPalindrome = _longestPalindromeSubstring(word, begin+i, end);
+            output = output.length() > nextPalindrome.length() ? output : nextPalindrome;
+        }
+
+        return output;
+    }
+
     public static void main(String[] args) {
-        Set<String> dict = new HashSet<>(Arrays.asList("am","pan","cam", "ampa", "ncam", "amp", "anc", "am"));
-        splitWordIntoDictionaryWords("ampancam", dict);
+
     }
 }

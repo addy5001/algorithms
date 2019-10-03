@@ -26,6 +26,69 @@ public class BinaryTree {
         root = null;
     }
 
+    public void balancedAdd(int val) {
+        if(root == null)
+            root = new BNode(val);
+        else
+            _balancedAdd(root, val);
+    }
+
+    private void _balancedAdd(BNode node, int val) {
+        if(node.left == null)
+            node.left = new BNode(val);
+        else if(node.right == null)
+            node.right = new BNode(val);
+        else {
+            int leftSubTreeCount = nodeCount(node.left);
+            int rightSubTreeCount = nodeCount(node.right);
+
+            if(leftSubTreeCount == rightSubTreeCount)
+                _balancedAdd(node.left, val);
+            else
+                _balancedAdd(node.right, val);
+        }
+    }
+
+    public void bfsAdd(int val) {
+        if(root == null)
+            root = new BNode(val);
+        else
+            _bfsAdd(root, val);
+    }
+
+    private void _bfsAdd(BNode node, int val) {
+        if(node.left == null)
+            node.left = new BNode(val);
+        else if(node.right == null)
+            node.right = new BNode(val);
+        else {
+            int leftDeepestLevel = leftDeepestLevel(node, 0);
+            int leftCount = nodeCount(node.left);
+            int rightCount = nodeCount(node.right);
+
+            if(leftCount == rightCount)
+                _bfsAdd(node.left, val);
+            else if(leftCount < Math.pow(2, leftDeepestLevel-1) - 1)
+                _bfsAdd(node.left, val);
+            else
+                _bfsAdd(node.right, val);
+        }
+    }
+
+    private int nodeCount(BNode bNode) {
+        if(bNode == null)
+            return 0;
+
+        return 1 + nodeCount(bNode.left) + nodeCount(bNode.right);
+    }
+
+    private int leftDeepestLevel(BNode node, int currentLevel) {
+        if(node == null)
+            return currentLevel;
+
+        return leftDeepestLevel(node.left, currentLevel+1);
+    }
+
     public boolean isBst() {
         return isBst(root, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
@@ -127,13 +190,24 @@ public class BinaryTree {
 
     public static void main(String[] args) {
         BinaryTree binaryTree = new BinaryTree();
-        binaryTree.root = new BNode(5);
-        binaryTree.root.left = new BNode(3);
-        binaryTree.root.right = new BNode(3);
-        binaryTree.root.left.left = new BNode(1);
-        binaryTree.root.left.right = new BNode(0);
-        binaryTree.root.right.right = new BNode(1);
+        binaryTree.bfsAdd(5);
+        binaryTree.bfsAdd(10);
+        binaryTree.bfsAdd(11);
+        binaryTree.bfsAdd(12);
+        binaryTree.bfsAdd(13);
+        binaryTree.bfsAdd(14);
+        binaryTree.bfsAdd(15);
+        binaryTree.bfsAdd(16);
+        binaryTree.bfsAdd(17);
+        binaryTree.bfsAdd(18);
+        binaryTree.bfsAdd(19);
+        binaryTree.bfsAdd(20);
+        binaryTree.bfsAdd(21);
+        binaryTree.bfsAdd(22);
+        binaryTree.bfsAdd(23);
+        binaryTree.bfsAdd(24);
+        binaryTree.bfsAdd(25);
 
-        System.out.println(binaryTree.isSymmetric());
+        System.out.println();
     }
 }

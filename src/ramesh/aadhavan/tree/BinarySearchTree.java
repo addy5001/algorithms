@@ -674,4 +674,37 @@ public class BinarySearchTree {
                 return lca(trackerSmall.left, trackerBig.right, smallVal, bigVal, lca);
         }
     }
+
+    public int maxDepthOfOddLevelLeafNode(Node node) {
+        return _maxDepthOfOddLevelLeafNode(node, 0);
+    }
+
+    private int _maxDepthOfOddLevelLeafNode(Node node, int currentLevel) {
+        if(node == null)
+            return 0;
+
+        if(node.left == null && node.right == null)
+            return (currentLevel & 1) == 1 ? currentLevel : 0;
+
+        int left = _maxDepthOfOddLevelLeafNode(node.left, currentLevel+1);
+        int right = _maxDepthOfOddLevelLeafNode(node.right, currentLevel+1);
+
+        return Math.max(left, right);
+    }
+
+    public Map<Integer, Integer> diagonalSum() {
+        Map<Integer, Integer> diagonalSumMap = new HashMap<>();
+        _diagonalSum(rootNode, 0, diagonalSumMap);
+        return diagonalSumMap;
+    }
+
+    private void _diagonalSum(Node node, int sumLevel, Map<Integer, Integer> diagonalSumMap) {
+        if(node == null)
+            return;
+
+        int sum = node.value + diagonalSumMap.getOrDefault(sumLevel, 0);
+        diagonalSumMap.put(sumLevel, sum);
+        _diagonalSum(node.right, sumLevel, diagonalSumMap);
+        _diagonalSum(node.left, sumLevel+1, diagonalSumMap);
+    }
 }

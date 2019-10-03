@@ -251,7 +251,127 @@ public class ArrayOperations {
             System.out.println("Next greater element of "+stack.pop()+" is null");
     }
 
+    public static int findLastIndexOfElementSorted(int[] arr, int begin, int end, int element) {
+        if(begin > end)
+            return -1;
+
+        int mid = (begin + end)/2;
+
+        if(element == arr[mid]) {
+            if((mid + 1) > end || arr[mid+1] > element)
+                return mid;
+            else
+                return findLastIndexOfElementSorted(arr, mid+1, end, element);
+        }
+        else if(element < arr[mid]) {
+            return findLastIndexOfElementSorted(arr, begin, mid - 1, element);
+        }
+        else {
+            return findLastIndexOfElementSorted(arr, mid + 1, end, element);
+        }
+    }
+
+    public static int findOddlyOccuringElementInEvenOccuringElementsArray(int[] arr) {
+        return Arrays.stream(arr).reduce(0, (x, y) -> x^y);
+    }
+
+    public static int[] rearrangeArrayIntoAlternativePositiveNegatives(int[] arr) {
+        int len = arr.length;
+        int[] result = new int[len];
+        Queue<Integer> negative = new LinkedList<>();
+        Queue<Integer> positive = new LinkedList<>();
+        boolean isLastPositive = false;
+
+        int j=0;
+        for(int i=0; i<len; i++) {
+            if(arr[i] > 0) {
+                if(isLastPositive) {
+                    positive.offer(arr[i]);
+                }
+                else {
+                    if(positive.peek() != null) {
+                        result[j] = positive.poll();
+                        positive.offer(arr[i]);
+                        j++;
+                    }
+                    else {
+                        result[j] = arr[i];
+                        j++;
+                    }
+                    isLastPositive = true;
+                }
+            }
+            else {
+                if(isLastPositive) {
+                    if(negative.peek() != null) {
+                        result[j] = negative.poll();
+                        negative.offer(arr[i]);
+                        j++;
+                    }
+                    else {
+                        result[j] = arr[i];
+                        j++;
+                    }
+                    isLastPositive = false;
+                }
+                else {
+                    negative.offer(arr[i]);
+                }
+            }
+        }
+
+        while (positive.peek() != null && negative.peek() != null) {
+            if(isLastPositive) {
+                result[j++] = negative.poll();
+                result[j++] = positive.poll();
+            }
+            else {
+                result[j++] = positive.poll();
+                result[j++] = negative.poll();
+            }
+        }
+
+        while(positive.peek() != null) {
+            result[j++] = positive.poll();
+        }
+
+        while (negative.peek() != null) {
+            result[j++] = negative.poll();
+        }
+
+        return result;
+    }
+
+    public static void permute(Integer arr[], int begin, int end, List<List<Integer>> permutedList) {
+        if(begin == end)
+            permutedList.add(new ArrayList<>(Arrays.asList(arr)));
+
+        for(int i=begin; i<end; i++) {
+            _swapInArray(arr, i, begin);
+            permute(arr, begin+1, end, permutedList);
+            _swapInArray(arr, i, begin);
+        }
+    }
+
+    private static void _swapInArray(Integer[] arr, int index1, int index2) {
+        int tmp = arr[index1];
+        arr[index1] = arr[index2];
+        arr[index2] = tmp;
+    }
+
+    public static void rotateArray(int[] arr) {
+        int halfN = arr.length/2;
+
+        for(int i=0, j=arr.length-1; i < halfN; i++, j--) {
+            int tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+    }
+
     public static void main(String[] args) {
-        printNextGreaterElements(new int[]{89,1,2,3,56,234,23,12,43,78});
+        int[] arr = new int[]{1, 2, 3, 4, 5};
+        rotateArray(arr);
+
     }
 }

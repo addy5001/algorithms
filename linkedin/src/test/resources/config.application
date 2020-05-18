@@ -1,0 +1,6 @@
+env=prod
+encryption=maximum
+hash=sha1
+hosts=5
+applicationName=logging
+username=${user}

@@ -9,7 +9,11 @@ import java.util.stream.Stream;
 
 public class KnapsackProblem {
     public static void findItems(Item[] items, int knapsackWeight) {
-        int minWeight = findMin(Stream.of(items));
+        int minWeight = Stream.of(items)
+                .mapToInt(Item::getWeight)
+                .min()
+                .orElseThrow(() -> new IllegalArgumentException("No minimum found"));
+
         int gridSeparator;
         if(knapsackWeight%minWeight == 0) gridSeparator = minWeight;
         else gridSeparator = 1;
@@ -44,14 +48,6 @@ public class KnapsackProblem {
             System.out.println();
         }
 
-    }
-
-    private static int findMin(Stream<Item> items) throws IllegalArgumentException {
-        OptionalInt min = items.mapToInt(Item::getWeight).min();
-        if(min.isPresent()) {
-            return min.getAsInt();
-        }
-        throw new IllegalArgumentException("No minimum found");
     }
 
     public static void main(String[] args) {

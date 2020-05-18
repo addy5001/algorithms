@@ -41,6 +41,19 @@ public class NaryTree {
         }
     }
 
+    public void preOrder() {
+        _preOrder(rootNode);
+    }
+
+    private void _preOrder(Node node) {
+        if(node == null)
+            return;
+
+        System.out.print(node.value+" ");
+        for(int i=0;i<breadth; i++)
+            _preOrder(node.nodes[i]);
+    }
+
     public static void main(String[] args) {
         NaryTree naryTree = new NaryTree(3);
         naryTree.rootNode = new Node(3, 1);
@@ -58,6 +71,6 @@ public class NaryTree {
         naryTree.rootNode.nodes[2].nodes[2] = new Node(3, 221);
 
         naryTree.mirrorTree();
-
+        naryTree.preOrder();
     }
 }

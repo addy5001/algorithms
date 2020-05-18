@@ -359,7 +359,7 @@ public class ArrayOperations {
         arr[index2] = tmp;
     }
 
-    public static void rotateArray(int[] arr) {
+    public static void reverseArray(int[] arr) {
         int halfN = arr.length/2;
 
         for(int i=0, j=arr.length-1; i < halfN; i++, j--) {
@@ -369,9 +369,535 @@ public class ArrayOperations {
         }
     }
 
-    public static void main(String[] args) {
-        int[] arr = new int[]{1, 2, 3, 4, 5};
-        rotateArray(arr);
+    public static void threeSum(int[] arr) {
 
+    }
+
+    public static void rotateArray(int[] arr, int k) {
+        int n = arr.length;
+        int counter = k % n;
+        while(counter > 0) {
+            int first = arr[0];
+            for (int i=1; i<n; i++) {
+                arr[i-1] = arr[i];
+            }
+            arr[n-1] = first;
+            counter--;
+        }
+    }
+
+    public static void rotateArrayRecurse(int[] arr, int k) {
+        int n = arr.length;
+        int counter = k % n;
+
+        if(counter == 0)
+            return;
+
+        reverseRange(arr, 0, counter-1);
+        reverseRange(arr, counter, arr.length-1);
+        reverseRange(arr, 0, arr.length-1);
+    }
+
+    private static void reverseRange(int[] arr, int start, int endInclusive) {
+        if(start >= endInclusive)
+            return;
+
+        int mid = (start + endInclusive)/2;
+
+        for(int i=start, j=endInclusive; i <= mid && j >= mid; i++, j--) {
+            int tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+    }
+
+    public static List<Integer> leadersInArray(int[] arr) {
+        if(arr == null || arr.length == 0)
+            return Collections.emptyList();
+
+        Deque<Integer> stack = new LinkedList<>();
+        for(int i : arr)
+            stack.push(i);
+
+        int leader = Integer.MIN_VALUE;
+        List<Integer> leaders = new ArrayList<>();
+        while(stack.peek() != null) {
+            int val = stack.pop();
+            if(val > leader) {
+                leaders.add(val);
+                leader = val;
+            }
+        }
+        return leaders;
+    }
+
+    public static boolean flowerPots(int[] flowerpots, int n) {
+        int canPlace = 0;
+
+        for(int i=0; i<flowerpots.length; i++) {
+            if ((i+1)==1) {
+                if(flowerpots[i] == 0 && flowerpots[i+1] == 0) {
+                    canPlace++;
+                }
+            }
+            else if(i==flowerpots.length-1) {
+                if(flowerpots[i-1] == 0 && flowerpots[i] == 0) {
+                    canPlace++;
+                }
+            }
+            else {
+                if(flowerpots[i-1] == 0 && flowerpots[i] == 0 && flowerpots[i+1] == 0) {
+                    flowerpots[i] = 1;
+                    canPlace++;
+                }
+            }
+        }
+
+        return canPlace >= n;
+    }
+
+    public static int maxSubArraySum(int[] arr) {
+        return _maxSubArraySum(arr, 0, arr.length-1, 0);
+    }
+
+    // TODO Optimize
+    private static int _maxSubArraySum(int[] arr, int begin, int end, int maxSum) {
+        if(begin == end)
+            return maxSum;
+
+        int nextSum;
+        int sum;
+
+        for(int i=begin; i<=end; i++) {
+            sum = _getSubArraySum(arr, begin, i);
+            if(begin == 0 && i == end)
+                return maxSum;
+
+            if(sum > maxSum)
+                maxSum = sum;
+            nextSum = _maxSubArraySum(arr, i+1, end, maxSum);
+            maxSum = (nextSum > sum) ? nextSum : sum;
+        }
+
+        return maxSum;
+    }
+
+    private static int _getSubArraySum(int[] arr, int begin, int end) {
+        if(begin == end)
+            return arr[begin];
+
+        int sum = 0;
+        for(int i=begin; i<=end; i++) {
+            sum+=arr[i];
+        }
+        return sum;
+    }
+
+    public static int maxSubArraySumKadaneAlgorithm(int[] arr) {
+        //TODO implement
+        return 0;
+    }
+
+    public static int[] frequenciesOfNumbers(int[] arr, int range) {
+        //TODO implement
+        return null;
+    }
+
+    /**
+     * Element greater than its neighbours
+     * @return
+     */
+    public static int findPeakElement(int[] arr) {
+        return _findPeakElement(arr, 0, arr.length - 1);
+    }
+
+    public static int _findPeakElement(int[] nums, int l, int r) {
+        if (l == r)
+            return l;
+        int mid = (l + r) / 2;
+        if (nums[mid] > nums[mid + 1])
+            return _findPeakElement(nums, l, mid);
+        return _findPeakElement(nums, mid + 1, r);
+    }
+
+    private static boolean _isPeakElement(int a, int b, int c) {
+        return (b > a) && (b > c);
+    }
+
+    public static int findPivotedElementInSortedArray(int[] arr) {
+        return _findPivot(arr, 0, arr.length-1);
+    }
+
+    private static int _findPivot(int[] arr, int begin, int end) {
+        if(begin > end)
+            return -1;
+
+        int mid = (begin + end)/2;
+
+        if((mid - 1) >= 0 && arr[mid-1] > arr[mid])
+            return mid;
+        else if(arr[mid] > arr[end])
+            return _findPivot(arr, mid+1, end);
+        else
+            return _findPivot(arr, begin, mid-1);
+    }
+
+    // TODO Optimize
+    public static int findIndexOf0InContinuousOnes(int[] arr) {
+        int maxLength = 0;
+        int zeroIndex = -1;
+
+        for(int i=0; i<arr.length; i++) {
+            if(arr[i] == 0) {
+                int length = _findLengthOf1s(arr, i) + 1;
+                if (length > maxLength) {
+                    maxLength = length;
+                    zeroIndex = i;
+                }
+            }
+        }
+
+        return zeroIndex;
+    }
+
+    private static int _findLengthOf1s(int[] arr, int idx) {
+        int leftLength = 0;
+        for(int i=idx-1; i>0; i--) {
+            if(arr[i] == 1)
+                leftLength++;
+            else
+                break;
+        }
+
+        int rightLength = 0;
+        for(int i=idx+1; i<arr.length; i++) {
+            if(arr[i] == 1)
+                rightLength++;
+            else
+                break;
+        }
+
+        return leftLength + rightLength;
+    }
+
+    public static int findIndexOf0InContinuousOnesOptimized(int[] arr) {
+        int leftLength = 0;
+        int rightLength = 0;
+        int maxLength = 0;
+        int prevIdx = -1, currIdx, maxIdx = -1;
+
+        for(int i=0; i<arr.length; i++) {
+            if(arr[i] == 0) {
+                currIdx = i;
+                int length = leftLength + 1 + rightLength;
+                if(length > maxLength) {
+                    maxLength = length;
+                    maxIdx = (prevIdx == -1) ? i : prevIdx;
+                }
+                prevIdx = currIdx;
+                leftLength = rightLength;
+                rightLength = 0;
+            }
+            else {
+                rightLength = rightLength+1;
+            }
+        }
+
+        if(arr[arr.length-1] == 0) {
+            if(leftLength+1 > maxLength) {
+                maxIdx = arr.length - 1;
+            }
+        }
+
+        return maxIdx;
+    }
+
+    public static void pancakeSort(int[] arr) {
+        boolean isSorted = false;
+
+        while(!isSorted) {
+            int beginIdx = -1;
+            for (int i = 1; i < arr.length; i++) {
+                if(arr[i-1] > arr[i]) {
+                    beginIdx = i-1;
+                    isSorted = false;
+                    break;
+                }
+            }
+
+            if(beginIdx == -1) {
+                return;
+            }
+
+            int curr = beginIdx+1;
+            int endIdx = arr.length - 1;
+            while(curr < arr.length) {
+                if(arr[beginIdx] < arr[curr]) {
+                    endIdx = curr-1;
+                    break;
+                }
+                curr++;
+            }
+
+            reverseRange(arr, beginIdx, endIdx);
+        }
+    }
+
+    public static void duplicateZeroes(int[] arr) {
+        for(int i=1; i<arr.length; i++) {
+            if(arr[i-1] == 0) {
+                rightShiftByOne(arr, i);
+                arr[i] = 0;
+                i++;
+            }
+        }
+    }
+
+    private static void rightShiftByOne(int [] arr, int begin) {
+        if(begin == arr.length - 1)
+            return;
+
+        for(int i=arr.length-1; i>begin; i--) {
+            arr[i] = arr[i-1];
+        }
+    }
+
+    public static int[] plusOne(int[] digits) {
+        int carry = 1;
+
+        for(int i=digits.length-1; i>=0; i--) {
+            if(carry == 0)
+                break;
+
+            int sum = digits[i] + carry;
+            int digit = sum%10;
+            digits[i] = digit;
+
+            carry = sum/10;
+        }
+
+        if(carry>0) {
+            int[] result = new int[digits.length+1];
+            result[0] = carry;
+            for(int i=1; i<result.length; i++)
+                result[i] = digits[i-1];
+            return result;
+        }
+
+        return digits;
+    }
+
+    private int _makeNumFromArray(int[] digits) {
+        int result = 0;
+
+        for(int i=0; i<digits.length; i++) {
+            result = result*10 + digits[i];
+        }
+
+        return result;
+    }
+
+    public void merge(int[] nums1, int m, int[] nums2, int n) {
+        int nums2Idx = 0;
+
+        while(nums2Idx < n) {
+            int item = nums2[nums2Idx];
+
+            int i=0;
+            for(; i<m; i++) {
+                if(nums1[i] > item)
+                    break;
+            }
+
+            if(i==m) {
+                nums1[m] = item;
+            }
+            else {
+                for(int j=m; j>i; j--) {
+                    nums1[j] = nums1[j-1];
+                }
+                nums1[i] = item;
+            }
+
+            nums2Idx++;
+            m++;
+        }
+    }
+
+    public static void moveZeroes(int[] nums) {
+        if(nums == null || nums.length == 0 || nums.length == 1)
+            return;
+
+        int i = 0;
+        for(int counter=0; counter < nums.length; counter++) {
+            if(nums[i] == 0) {
+                int j = i;
+                while(j+1 < nums.length) {
+                    nums[j] = nums[j+1];
+                }
+                nums[nums.length-1] = 0;
+            }
+            else {
+                i++;
+            }
+        }
+    }
+
+    public static int sumDivideAndConquer(int[] nums) {
+        return _sumDivideAndConquer(nums, 0, nums.length-1);
+    }
+
+    private static int _sumDivideAndConquer(int[] nums, int begin, int end) {
+        if(begin == end)
+            return nums[begin];
+
+        int mid = (begin+end)/2;
+
+        int leftSum = _sumDivideAndConquer(nums, begin, mid);
+        int rightSum = _sumDivideAndConquer(nums, mid+1, end);
+
+        return leftSum+rightSum;
+    }
+
+    public static int[] findErrorNums(int[] nums) {
+        int n = nums.length;
+        for(int i=0; i<nums.length; i++)
+            nums[i] = nums[i]-1;
+
+        for(int i=0; i<nums.length; i++) {
+            int idx = nums[i] % n;
+            nums[idx] = nums[idx] + n;
+        }
+
+        int[] results = new int[2];
+        for(int i=0; i<nums.length; i++) {
+            nums[i] = nums[i]/n;
+            if(nums[i] == 2) {
+                results[0] = i+1;
+            }
+            else if(nums[i] == 0) {
+                results[1] = i+1;
+            }
+        }
+
+        return results;
+    }
+
+    public int[] searchRange(int[] nums, int target) {
+        if(nums == null || nums.length < 1)
+            return new int[]{-1, -1};
+
+        int[] results = new int[2];
+        results[0] = _firstElement(nums, target);
+        results[1] = _lastElement(nums, target);
+
+        return results;
+    }
+
+    private int _firstElement(int[] nums, int target) {
+        int begin = 0, end = nums.length - 1;
+
+        while(begin <= end) {
+            int mid = begin + (end - begin)/2;
+
+            if(nums[mid] == target) {
+                if(mid == 0 || (nums[mid-1] < nums[mid]))
+                    return mid;
+                else
+                    end = mid - 1;
+            }
+            else if(nums[mid] > target)
+                end = mid - 1;
+            else
+                begin = mid + 1;
+        }
+
+        return -1;
+    }
+
+    private int _lastElement(int[] nums, int target) {
+        int begin = 0, end = nums.length -1;
+
+        while(begin <= end) {
+            int mid = begin + (end - begin)/2;
+
+            if(nums[mid] == target) {
+                if((mid == nums.length - 1) || (nums[mid] < nums[mid+1]))
+                    return mid;
+                else
+                    begin = mid + 1;
+            }
+            else if(nums[mid] < target)
+                begin = mid + 1;
+            else
+                end = mid - 1;
+        }
+
+        return -1;
+    }
+
+    public int removeDuplicates(int[] nums) {
+        if(nums == null)
+            return 0;
+
+        if(nums.length == 1)
+            return 1;
+
+        int i = 0;
+        int j = 1;
+
+        while(j < nums.length) {
+            if(nums[i] == nums[j]) {
+                j++;
+            }
+            else {
+                if(j != i+1) {
+                    nums[i+1] = nums[j];
+                }
+                i++;
+                j++;
+            }
+        }
+
+        return i+1;
+    }
+
+    public void rotate(int[] nums, int k) {
+        if(nums.length == 1)
+            return;
+
+        int n = nums.length;
+        int numRotations = k % n;
+
+        if(k == 0)
+            return;
+
+        reverse(nums, 0, n-1);
+        reverse(nums, 0, k-1);
+        reverse(nums, k, n-1);
+    }
+
+    private void reverse(int[] nums, int start, int end) {
+        if(start >= end)
+            return;
+
+        int temp = nums[start];
+        nums[start] = nums[end];
+        nums[end] = temp;
+
+        reverse(nums, ++start, --end);
+    }
+
+    public void shuffle(int[] nums) {
+        Random random = new Random();
+
+        for(int i=0; i<nums.length; i++) {
+            int x = random.nextInt(nums.length - i);
+            int idx = x + i;
+
+            int temp = nums[i];
+            nums[i] = nums[idx];
+            nums[idx] = temp;
+        }
     }
 }

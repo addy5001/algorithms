@@ -187,7 +187,336 @@ public class StringOperations {
         return output;
     }
 
-    public static void main(String[] args) {
+    public static int longestPalindrome(String s) {
+        int[] capitals = new int[26];
+        int[] smalls = new int[26];
 
+        for(char a : s.toCharArray()) {
+            if(a >=65 && a <= 90) {
+                capitals[a-65]++;
+            }
+            else if(a >= 97 && a <= 122) {
+                smalls[a-97]++;
+            }
+        }
+
+        int maxOdd = 0;
+        int evenLength = 0;
+        for(int i : capitals) {
+            if(i != 0) {
+                if((i&1) == 0) {
+                    evenLength+=i;
+                }
+                else {
+                    if(maxOdd < i) {
+                        evenLength+=(i-1);
+                        maxOdd = 1;
+                    }
+                }
+            }
+        }
+
+        for(int i : smalls) {
+            if(i != 0) {
+                if((i&1) == 0) {
+                    evenLength+=i;
+                }
+                else {
+                    if(maxOdd < i) {
+                        evenLength+=(i-1);
+                        maxOdd=1;
+                    }
+                }
+            }
+        }
+
+        return (evenLength != 0) ? evenLength + maxOdd : maxOdd;
+    }
+
+    public int lengthOfLastWord(String s) {
+        return _lengthCharByChar(s, s.length()-1, 0, false);
+    }
+
+    private int _lengthCharByChar(String s, int end, int len, boolean lastCharSeen) {
+        if(end < 0)
+            return len;
+
+        if(s.charAt(end) == ' ') {
+            if(lastCharSeen)
+                return len;
+            else
+                return _lengthCharByChar(s, end-1, len, false);
+        }
+
+        return _lengthCharByChar(s, end-1, len+1, true);
+    }
+
+    private int _lengthOfLastWordJavaSolution(String s) {
+        if(s == null || s.length() == 0)
+            return 0;
+
+        String[] splits = s.split(" ");
+
+        if(splits.length == 0)
+            return 0;
+
+        int lastWord = splits.length-1;
+
+        if(splits[lastWord] == " ")
+            return 0;
+
+        return splits[lastWord].length();
+    }
+
+    public static boolean isPalindrome(String s) {
+        if(s == null || s.length() == 0 || s.length() == 1)
+            return true;
+
+        int begin = 0;
+        int end = s.length()-1;
+
+        while(begin < end) {
+            if(! (Character.isAlphabetic(s.charAt(begin)) || Character.isDigit(s.charAt(begin))))
+                begin++;
+            else if(! (Character.isAlphabetic(s.charAt(end)) || Character.isDigit(s.charAt(end))))
+                end--;
+            else {
+                if((s.charAt(begin) | 32) != (s.charAt(end) | 32))
+                    return false;
+
+                begin++;
+                end--;
+            }
+        }
+
+        return true;
+    }
+
+
+    public boolean wordPattern(String pattern, String str) {
+        return _wordPatternHashMap(pattern, str);
+    }
+
+    private boolean _wordPatternHashMap(String pattern, String str) {
+        Map<Character, String> map = new HashMap<>();
+
+        char[] keys = pattern.toCharArray();
+        String[] words = str.split(" ");
+
+        if(keys.length != words.length)
+            return false;
+
+        int i = 0;
+        while(i < keys.length) {
+            if(map.containsKey(keys[i])) {
+                if(! map.get(keys[i]).equals(words[i])) {
+                    return false;
+                }
+            }
+            else {
+                map.put(keys[i], words[i]);
+            }
+
+            i++;
+        }
+
+        return true;
+    }
+
+    public static boolean detectCapitalUse(String word) {
+        return _detect(word, 0, word.length(), true, false, false);
+    }
+
+    private static boolean _detect(String word,
+                            int begin, int end, boolean result,
+                            boolean firstCaps, boolean secondCaps) {
+        if(begin == end || !result)
+            return result;
+
+        if(begin == 0) {
+            return _detect(word, begin+1, end, true,
+                    Character.isUpperCase(word.charAt(0)), secondCaps);
+        }
+        else if(begin == 1) {
+            boolean second = Character.isUpperCase(word.charAt(1));
+            if(!firstCaps && second)
+                result = false;
+
+            return _detect(word, begin+1, end, result, firstCaps, second);
+        }
+        else {
+            boolean current = Character.isUpperCase(word.charAt(begin));
+            if(firstCaps) {
+                if(secondCaps) {
+                    result = current ? true : false;
+                }
+                else {
+                    result = current ? false : true;
+                }
+            }
+            else {
+                result = current ? false : true;
+            }
+
+            return _detect(word, begin+1, end, result, firstCaps, secondCaps);
+        }
+    }
+
+    public static boolean isSubsequence(String s, String t) {
+        if(s == null || t == null)
+            return false;
+
+        int tIdx = 0;
+        int sIdx = 0;
+
+        while(sIdx < s.length() && tIdx < t.length()) {
+            if(s.charAt(sIdx) == t.charAt(tIdx)) {
+                sIdx++;
+                tIdx++;
+            }
+            else {
+                tIdx++;
+            }
+        }
+
+        return sIdx == s.length();
+    }
+
+    public static String shortestCompletingWord(String licensePlate, String... words) {
+        int[] charMap = new int[26];
+
+        for(int i=0; i<licensePlate.length(); i++) {
+            if(Character.isAlphabetic(licensePlate.charAt(i))) {
+                char x = (char) (licensePlate.charAt(i) | 32);
+                charMap[(x-97) % 26]++;
+            }
+        }
+
+        String shortestWord = null;
+        int shortestLen = Integer.MAX_VALUE;
+
+        for(String word : words) {
+            int[] charMapCopy = new int[26];
+            System.arraycopy(charMap, 0, charMapCopy, 0, charMap.length);
+            boolean contains = true;
+
+            for(char c : word.toCharArray()) {
+                if(Character.isAlphabetic(c)) {
+                    char comp = (char) (c | 32);
+                    charMapCopy[(comp - 97) % 26]--;
+                }
+            }
+
+            for(int i : charMapCopy) {
+                if(i >= 1) {
+                    contains = false;
+                    break;
+                }
+            }
+
+            if(contains && word.length() < shortestLen) {
+                shortestWord = word;
+                shortestLen = word.length();
+            }
+        }
+
+        return shortestWord;
+    }
+
+    public List<String> commonChars(String[] A) {
+        int[][] matrix = calculateOccurenceMatrix(A);
+        return calculateCommonChars(matrix, A.length);
+    }
+
+    private int[][] calculateOccurenceMatrix(String[] A) {
+        int m = A.length;
+        int n = 26;
+        int[][] matrix = new int[m][n];
+
+        for(int i=0; i<m; i++) {
+            String s = A[i];
+            for(int j=0; j<s.length(); j++) {
+                int idx = (s.charAt(j) - 97);
+                matrix[i][idx]++;
+            }
+        }
+
+        return matrix;
+    }
+
+    private List<String> calculateCommonChars(int[][] matrix, int m) {
+        List<String> results = new ArrayList<>();
+
+        for(int j=0; j<26; j++) {
+            int min = Integer.MAX_VALUE;
+            int counter = 0;
+            for(int i=0; i<m; i++) {
+                if(matrix[i][j] != 0) {
+                    if(matrix[i][j] < min)
+                        min = matrix[i][j];
+                    counter++;
+                }
+            }
+
+            if(counter == m) {
+                while(min > 0) {
+                    results.add(String.valueOf(j + 97));
+                    min--;
+                }
+            }
+        }
+
+        return results;
+    }
+
+    // without repeating characters
+    public int lengthOfLongestSubstring(String s) {
+        HashSet<Character> hashSet = new HashSet<>();
+        int maxLen = 0;
+
+        for(int i=0; i<s.length(); i++) {
+            hashSet.clear();
+            int len = 0;
+            for(int j=i; j<s.length(); j++) {
+                if(!hashSet.contains(s.charAt(j))) {
+                    hashSet.add(s.charAt(j));
+                    len++;
+                }
+                else
+                    break;
+            }
+
+            if(len > maxLen)
+                maxLen = len;
+        }
+
+        return maxLen;
+    }
+
+    public int lengthOfLongestSubstringOptimized(String s) {
+        Map<Character, Integer> map = new HashMap<>();
+
+        int start = 0, end = 0;
+        int maxLen = 0;
+        int len = 0;
+        while(end < s.length()) {
+            if(!map.containsKey(s.charAt(end))) {
+                len++;
+            }
+            else {
+                int positionOfChar = map.get(s.charAt(end));
+                if(positionOfChar >= start)
+                    start = map.get(s.charAt(end)) + 1;
+                len = end - start + 1;
+            }
+
+            map.put(s.charAt(end), end);
+            if(len > maxLen)
+                maxLen = len;
+
+            end++;
+        }
+
+        return maxLen;
     }
 }

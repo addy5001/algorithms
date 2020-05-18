@@ -56,6 +56,19 @@ public class Math {
         return romanMap;
     }
 
+    private Map<Integer, Character> initReverseMap() {
+        Map<Integer, Character> romanMap = new HashMap<>();
+        romanMap.put(1, 'I');
+        romanMap.put(5, 'V');
+        romanMap.put(10, 'X');
+        romanMap.put(50, 'L');
+        romanMap.put(100, 'C');
+        romanMap.put(500, 'D');
+        romanMap.put(1000, 'M');
+        return romanMap;
+    }
+
+
     public int romanToInt(String s) {
         Map<Character, Integer> romanMap = initMap();
         if(s.length() == 1)

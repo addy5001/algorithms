@@ -1,17 +1,23 @@
 package ramesh.aadhavan.list;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import java.util.Deque;
 import java.util.Map;
 import java.util.Objects;
 
 public class LinkedList {
-    private SingleLinkedListNode head;
+    SingleLinkedListNode head;
 
     public LinkedList() {
         this.head = null;
     }
 
     public LinkedList(SingleLinkedListNode head) { this.head = head; }
+
+    private void setHead(SingleLinkedListNode head) {
+        this.head = head;
+    }
 
     public void add(int value) {
         if(Objects.isNull(head))
@@ -41,6 +47,14 @@ public class LinkedList {
         }
 
         addRecursive(node.getNext(), val);
+    }
+
+    private SingleLinkedListNode _addRecursive(SingleLinkedListNode head, int val) {
+        if(head == null)
+            return new SingleLinkedListNode(val);
+
+        head.next = _addRecursive(head.next, val);
+        return head;
     }
 
     public boolean isEmpty() {
@@ -121,7 +135,8 @@ public class LinkedList {
         head = reverseList(head);
     }
 
-    public SingleLinkedListNode reverseList(SingleLinkedListNode node) {
+    @VisibleForTesting
+    SingleLinkedListNode reverseList(SingleLinkedListNode node) {
         if(node == null || node.next == null)
             return node;
 
@@ -130,6 +145,26 @@ public class LinkedList {
         node.next = null;
 
         return rest;
+    }
+
+    @VisibleForTesting
+    SingleLinkedListNode reverseListIterative(SingleLinkedListNode node) {
+        if(node == null || node.next == null)
+            return node;
+
+        SingleLinkedListNode prev = node;
+        SingleLinkedListNode fwd = node.next;
+
+        prev.next = null;
+
+        while(fwd != null) {
+            SingleLinkedListNode temp = fwd.next;
+            fwd.next = prev;
+            prev = fwd;
+            fwd = temp;
+        }
+
+        return prev;
     }
 
     public int findNthFromEnd(int n) {
@@ -162,26 +197,19 @@ public class LinkedList {
     }
 
     public void removeRecursive(int val) {
-        if(head.getValue() == val) {
-            head = head.getNext();
-        }
-        else {
-            if(!removeRecursive(head, val))
-                System.out.println("Element not found!");
-        }
+        head = removeRecursive(head, val);
     }
 
-    private boolean removeRecursive(SingleLinkedListNode node, int val) {
-        if(node.getNext() != null) {
-            if(node.getNext().getValue() == val) {
-                SingleLinkedListNode replace = node.getNext().getNext();
-                node.setNext(replace);
-                return true;
-            }
-            return removeRecursive(node.getNext(), val);
+    private SingleLinkedListNode removeRecursive(SingleLinkedListNode node, int val) {
+        if(node == null)
+            return null;
+
+        if(val == node.value) {
+            return node.next;
         }
         else {
-            return false;
+            node.next = removeRecursive(node.next, val);
+            return node;
         }
     }
 
@@ -212,26 +240,61 @@ public class LinkedList {
         if(head == null || head.next == null)
             return;
 
-        boolean swapped = false;
-        int[] arr = new int[k];
-        SingleLinkedListNode node = head;
+        int len = findLength(head, 0);
 
-        while(node != null) {
-            int counter = 1;
-            for(int i=0; i<k && node!=null; i++, counter++) {
-                arr[i] = node.value;
-                node = node.next;
-            }
+        if(len <= k)
+            head = reverseList(head);
+        else {
+            SingleLinkedListNode pointer = head;
+            SingleLinkedListNode kBehind = head;
+            SingleLinkedListNode prevKBehind = head;
+            int reversed = 0;
+            boolean swapped = false;
 
-            if(!swapped) {
-                reverseArray(arr, counter-1);
-                node = copyFromArray(node, arr, counter-1);
-                swapped = true;
-            }
-            else {
-                swapped = false;
+            while(reversed < len) {
+                int counter = 0;
+                for(;counter < k; counter++) {
+                    if (pointer == null)
+                        break;
+                    pointer = pointer.next;
+                }
+
+                if(!swapped) {
+                    if (reversed == 0) {
+                        head = reverseKNodes(head, pointer, 0, k - 1);
+                    }
+                    else {
+                        prevKBehind.next = reverseKNodes(kBehind, pointer, 0, k-1);
+                    }
+
+                    kBehind = pointer;
+                    swapped = true;
+                    reversed += counter;
+                }
+                else {
+                    for(int i=0; i<k; i++) {
+                        if(kBehind == null)
+                            break;
+                        prevKBehind = kBehind;
+                        kBehind = kBehind.next;
+                    }
+                    swapped = false;
+                    reversed+=counter;
+                }
             }
         }
+    }
+
+    private SingleLinkedListNode reverseKNodes(SingleLinkedListNode node, SingleLinkedListNode nextInList, int pointer, int length) {
+        if(node == null || node.next == null || pointer == length) {
+            return node;
+        }
+
+        SingleLinkedListNode rest = reverseKNodes(node.next, nextInList, pointer+1, length);
+        node.next.next = node;
+        node.next = nextInList;
+
+        return rest;
     }
 
     private static int findLength(SingleLinkedListNode node, int len) {
@@ -239,31 +302,6 @@ public class LinkedList {
             return len;
 
         return findLength(node.next, len+1);
-    }
-
-    private void reverseArray(int[] arr, int length) {
-        int mid = length/2;
-        int end = length - 1;
-
-        for(int i=0; i<mid; i++) {
-            int tmp = arr[i];
-            arr[i] = arr[end];
-            arr[end] = tmp;
-            end--;
-        }
-    }
-
-    private SingleLinkedListNode copyFromArray(SingleLinkedListNode node, int[] arr, int k) {
-        if(node == null)
-            return node;
-
-        SingleLinkedListNode tracker = node;
-        for(int i=0; i<k; i++, tracker = tracker.next) {
-            if(tracker == null)
-                return node;
-            tracker.value = arr[i];
-        }
-        return node;
     }
 
     public static void sumOfListsAsNumbers(SingleLinkedListNode list1, SingleLinkedListNode list2) {
@@ -369,17 +407,240 @@ public class LinkedList {
         }
     }
 
+    public void reverseListIterative() {
+        if(head == null || head.next == null)
+            return;
+
+        SingleLinkedListNode curr = head;
+        curr = curr.next;
+        head.next = null;
+
+        while(curr != null) {
+            SingleLinkedListNode nextCurr = curr;
+            nextCurr = nextCurr.next;
+
+            curr.next = head;
+            head = curr;
+
+            curr = nextCurr;
+        }
+    }
+
+    public static LinkedList mergeKSortedLists(LinkedList[] lists, int k) {
+        LinkedList sortedList = new LinkedList();
+        Integer nextMin = findNextMin(lists, k);
+        while (nextMin != null) {
+            sortedList.add(nextMin);
+            nextMin = findNextMin(lists, k);
+        }
+
+        return sortedList;
+    }
+
+    private static Integer findNextMin(LinkedList[] lists, int k) {
+        int min = Integer.MAX_VALUE;
+        int minNodeIndex = 0;
+        int i = 0;
+        boolean found = false;
+
+        while(i < k) {
+            if(lists[i] != null && lists[i].head != null) {
+                if(min > lists[i].head.value) {
+                    min = lists[i].head.value;
+                    minNodeIndex = i;
+                    found = true;
+                }
+            }
+            i++;
+        }
+
+        if(found) {
+            lists[minNodeIndex].head = lists[minNodeIndex].head.next;
+            return min;
+        }
+        return null;
+    }
+
+    public static LinkedList mergeKSortedListsDivideAndConquer(LinkedList[] lists) {
+        return _mergeKSortedListsDivideAndConquer(lists, 0, lists.length-1);
+    }
+
+    private static LinkedList _mergeKSortedListsDivideAndConquer(LinkedList[] lists, int start, int end) {
+        if(start == end)
+            return lists[start];
+
+        if(start < end) {
+            int mid = (end + start)/2;
+            LinkedList sorted1 = _mergeKSortedListsDivideAndConquer(lists, start, mid);
+            LinkedList sorted2 = _mergeKSortedListsDivideAndConquer(lists, mid+1, end);
+            return merge2SortedLists(sorted1, sorted2);
+        }
+
+        return null;
+    }
+
+    public static LinkedList merge2SortedLists(LinkedList list1, LinkedList list2) {
+        if(list1 == null && list2 == null)
+            return null;
+
+        if(list1 == null)
+            return list2;
+
+        if(list2 == null)
+            return list1;
+
+        SingleLinkedListNode node1 = list1.head;
+        SingleLinkedListNode node2 = list2.head;
+        SingleLinkedListNode prevNode1 = list1.head;
+
+        while(node1 != null && node2 != null) {
+            if(node1.value >= node2.value) {
+                SingleLinkedListNode tmp = node2;
+                if(node1 == list1.head) {
+                    list1.head = tmp;
+                    prevNode1 = list1.head;
+                }
+                else {
+                    prevNode1.next = tmp;
+                    prevNode1 = prevNode1.next;
+                }
+                node2 = node2.next;
+                tmp.next = node1;
+            }
+            else {
+                prevNode1 = node1;
+                node1 = node1.next;
+            }
+        }
+
+        if(node2 != null) {
+            prevNode1.next = node2;
+        }
+
+        return list1;
+    }
+
+    public static SingleLinkedListNode rotateList(SingleLinkedListNode head, int k) {
+        int n = findLength(head, 0);
+        int rotateLen = k % n;
+        if(rotateLen == 0)
+            return head;
+
+        SingleLinkedListNode toRotateNode = _getKthFromEnd(head, rotateLen);
+
+        SingleLinkedListNode headPtr = head;
+        while(headPtr.next != toRotateNode) {
+            headPtr = headPtr.next;
+        }
+
+        SingleLinkedListNode ptr = toRotateNode;
+        while(ptr.next != null) {
+            ptr = ptr.next;
+        }
+
+        ptr.next = head;
+        headPtr.next = null;
+        head = toRotateNode;
+
+        return head;
+    }
+
+    private static SingleLinkedListNode _getKthFromEnd(SingleLinkedListNode node, int k) {
+        SingleLinkedListNode ptr = node;
+        while(k>0 && ptr!=null) {
+            ptr = ptr.next;
+            k--;
+        }
+
+        while(ptr!=null) {
+            node = node.next;
+            ptr = ptr.next;
+        }
+
+        return node;
+    }
+
+    public LinkedList[] segmentLists(int k) {
+        LinkedList[] segmentedLists = new LinkedList[k];
+        for(int i=0; i<k; i++)
+            segmentedLists[i] = new LinkedList();
+
+        if(head == null) {
+            return segmentedLists;
+        }
+
+        int n = findLength(head, 0);
+        int segment = n/k;
+        int remainders = n%k;
+        int partitionCounter = 0;
+
+        SingleLinkedListNode ptr = head;
+        while(ptr != null) {
+            SingleLinkedListNode newList = ptr;
+            SingleLinkedListNode prev = ptr;
+            for(int i=0; i<segment && ptr!=null; i++) {
+                prev = ptr;
+                ptr = ptr.next;
+            }
+
+            if(remainders > 0 && ptr!=null) {
+                prev = ptr;
+                ptr = ptr.next;
+                remainders--;
+            }
+
+            prev.next = null;
+            segmentedLists[partitionCounter].setHead(newList);
+            partitionCounter++;
+        }
+
+        return segmentedLists;
+    }
+
+    public int length() {
+        return findLength(head, 0);
+    }
+
     public static void main(String[] args) {
         LinkedList list = new LinkedList();
-        list.add(5);
         list.add(3);
-        list.add(1);
+        list.add(4);
+        list.add(11);
+
+        list.removeRecursive(4);
+        list.removeRecursive(3);
+        list.removeRecursive(11);
 
         LinkedList list2 = new LinkedList();
-        list2.add(7);
-        list2.add(7);
-        list2.add(5);
+        list2.add(2);
+        list2.add(3);
+        list2.add(10);
 
-        LinkedList result = sumOfListsAsNumbersRecursive(list.head, list2.head);
+        LinkedList list3 = new LinkedList();
+        list3.add(5);
+        list3.add(6);
+        list3.add(9);
+
+        LinkedList list4 = new LinkedList();
+        list4.add(15);
+        list4.add(16);
+        list4.add(19);
+
+        LinkedList list5 = new LinkedList();
+        list5.add(0);
+        list5.add(100);
+        list5.add(200);
+
+//        LinkedList[] lists = new LinkedList[5];
+//        lists[0] = list;
+//        lists[1] = list2;
+//        lists[2] = list3;
+//        lists[3] = list4;
+//        lists[4] = list5;
+//
+//        list = mergeKSortedListsDivideAndConquer(lists);
+
+
+        list5.head = rotateList(list5.head, 4);
     }
 }

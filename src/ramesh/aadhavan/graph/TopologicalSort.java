@@ -1,8 +1,9 @@
 package ramesh.aadhavan.graph;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
-public class Graph {
+public class TopologicalSort {
     static class Node {
         int id;
         Node next;
@@ -71,12 +72,7 @@ public class Graph {
             Node temp = node.next;
 
             while(temp!=null) {
-                if(inDegrees.containsKey(temp)) {
-                    inDegrees.put(temp, inDegrees.get(temp) + 1);
-                }
-                else {
-                    inDegrees.put(temp, 1);
-                }
+                inDegrees.put(temp, inDegrees.getOrDefault(temp, 0) + 1);
                 temp = temp.next;
             }
         }
@@ -84,12 +80,7 @@ public class Graph {
     }
 
     private List<Node> calculateZeroDegreeNodes(Map<Node, Integer> inDegrees) {
-        final List<Node> zeroDegreesList = new ArrayList<>();
-        nodeList.forEach(node -> {
-            if(!inDegrees.containsKey(node))
-                zeroDegreesList.add(node);
-        });
-        return zeroDegreesList;
+        return nodeList.stream().dropWhile(inDegrees::containsKey).collect(Collectors.toList());
     }
 
     public void topologicalSort() {
@@ -118,7 +109,7 @@ public class Graph {
     }
 
     public static void main(String[] args) {
-        Graph graph = new Graph();
+        TopologicalSort graph = new TopologicalSort();
 
         graph.addEdge(1,2);
         graph.addEdge(2,3);

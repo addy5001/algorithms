@@ -1,0 +1,5 @@
+user=admin
+env=prod
+encryption=standard
+hash=md5
+namespace=utility

@@ -1,24 +1,22 @@
 package ramesh.aadhavan;
 
-import ramesh.aadhavan.tree.BinarySearchTree;
-
-import java.util.Map;
+import java.util.TreeSet;
 
 public class Main {
     public static void main(String[] args) {
-        BinarySearchTree bst = new BinarySearchTree();
+        TreeSet<Integer> treeSet = new TreeSet<>();
+        treeSet.add(1);
+        treeSet.add(3);
+        treeSet.add(6);
+        treeSet.add(7);
+        treeSet.add(10);
+        treeSet.add(20);
+        treeSet.add(21);
+        treeSet.add(26);
+        treeSet.add(30);
 
-        bst.addNode(100);
-        bst.addNode(50);
-        bst.addNode(150);
-        bst.addNode(120);
-        bst.addNode(110);
-        bst.addNode(25);
-        bst.addNode(75);
-
-        Map<Integer, Integer> diagonalSum = bst.diagonalSum();
-        diagonalSum.forEach((k,v) -> {
-            System.out.println("Level: "+k+" = "+"Sum: "+v);
-        });
+        System.out.println(treeSet.floor(7));
+        System.out.println(treeSet.ceiling(10));
+        System.out.println(treeSet.higher(10));
     }
 }
